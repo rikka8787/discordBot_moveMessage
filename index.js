@@ -27,7 +27,7 @@ client.on(Events.MessageCreate, async (message) => {
 			});
 		}
 		else {
-			await postChannel.send(message.content);
+			await postChannel.send('@everyone ' + message.content);
 		}
 	}
 });
