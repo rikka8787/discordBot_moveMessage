@@ -31,5 +31,27 @@ client.on(Events.MessageCreate, async (message) => {
 		}
 	}
 });
+client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+	if (CHANNEL_LISTEN.includes(oldMessage.channel.id)) {
+		const postChannel = client.channels.cache.get(CHANNEL_POST);
+
+		// 檢查訊息是否包含圖片
+		if (newMessage.attachments.size > 0) {
+			const attachment = newMessage.attachments.first();
+			const fetchedMessages = await postChannel.messages.fetch({ around: oldMessage.id, limit: 1 });
+			const fetchedMessage = fetchedMessages.first();
+			await fetchedMessage.edit({
+				content: newMessage.content,
+				files: [attachment.url],
+			});
+		}
+		else {
+			const fetchedMessages = await postChannel.messages.fetch({ after: oldMessage.id, limit: 1 });
+			const fetchedMessage = fetchedMessages.first();
+			await fetchedMessage.edit('@everyone ' + newMessage.content);
+		}
+	}
+});
+
 
 client.login(token);
