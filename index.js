@@ -52,6 +52,16 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 		}
 	}
 });
+client.on(Events.MessageDelete, async (deletedMessage) => {
+	if (CHANNEL_LISTEN.includes(deletedMessage.channel.id)) {
+		const postChannel = client.channels.cache.get(CHANNEL_POST);
+		const fetchedMessages = await postChannel.messages.fetch({ around: deletedMessage.id, limit: 1 });
+		const fetchedMessage = fetchedMessages.first();
+		if (fetchedMessage) {
+			await fetchedMessage.delete();
+		}
+	}
+});
 
 
 client.login(token);
